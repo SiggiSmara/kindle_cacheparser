@@ -9,7 +9,9 @@ You are running python >= 3.9
 
 ## How to run it
 
-run `python parseme.py path/to/kindle/cache.xml`
+If you haven't installed the requirements do so now. `pip install -r requirements.txt`
+
+Once requirements are installed you can simply run `python parseme.py --help` to get more information.
 
 The script will write a csv with the kindle cache content it finds in
 the xml. The name of the csv will be kindlecache.csv in the same folder you are running your script in.
