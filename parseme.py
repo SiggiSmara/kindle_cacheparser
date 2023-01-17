@@ -38,6 +38,8 @@ def get_list(in_file:Path):
                     one_meta["authors"] = [normalize_name(one_auth["#text"]) for one_auth in one_meta["authors"]["author"]]
                 # if len(one_meta["authors"]) > 1:
                 #     print(", ".join(one_meta["authors"]))
+                if len(one_meta["authors"]) > 0:
+                    one_meta["author"] = one_meta["authors"][0]
                 one_meta["authors"] = ", ".join(one_meta["authors"])
 
         #simplify the structure for publishers:
@@ -46,34 +48,43 @@ def get_list(in_file:Path):
                 one_meta["publishers"] = [one_meta["publishers"]["publisher"],]
             else:
                 one_meta["publishers"] = [one_auth for one_auth in one_meta["publishers"]["publisher"]]
+            if len(one_meta["publishers"]) > 0:
+                one_meta["publisher"] = one_meta["publishers"][0]
             one_meta["publishers"] = ",".join(one_meta["publishers"])
             # if len(one_meta["publishers"]) > 1:
             #     print(one_meta["publishers"])
     return my_dict
 
 def write_csv(kindle_list:list, out_file:Path):
-    csv_headers = [
-        "ASIN",
-        "title",
-        "authors",
-        "publishers",
-        "publication_date",
-        "purchase_date",
-        "textbook_type",
-        "cde_contenttype",
-        "content_type",
-    ]
+    csv_headers = {
+        "ASIN":"ASIN",
+        "title":"title",
+        "authors":"authors",
+        "author":"author",
+        "publishers":"publishers",
+        "publisher":"publisher",
+        "publication_date":"publication date",
+        "purchase_date":"purchase date",
+        "textbook_type":"textbook type",
+        "cde_contenttype":"cde contenttype",
+        "content_type":"content type",
+        "date_read":"date read",
+        "date_added":"date added"
+    }
     with open(out_file, "w") as fp:
         my_writer = csv.DictWriter(
             fp, 
-            fieldnames=csv_headers, 
+            fieldnames=csv_headers.values(), 
             dialect="excel", 
             quoting=csv.QUOTE_ALL
         )
         my_writer.writeheader()
         for one_row in kindle_list:
             try:
-                my_row = {key:item for key,item in one_row.items() if key in csv_headers }
+                my_row = {key.replace("_"," "):item for key,item in one_row.items() if key in csv_headers }
+                my_row["date read"] = my_row["purchase date"]
+                my_row["date added"] = my_row["purchase date"]
+                
                 my_writer.writerow(my_row)
                 # my_writer.writerow(one_row)
             except ValueError as e:
